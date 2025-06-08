@@ -34,6 +34,11 @@ export default function List({
   const supabase = createClient();
 
   useEffect(() => {
+    let mounted = true;
+    let listChannel: any = null;
+    let itemsChannel: any = null;
+    let authSubscription: any = null;
+
     const fetchListAndItems = async () => {
       try {
         setIsLoading(true);
@@ -46,6 +51,8 @@ export default function List({
           window.location.href = '/';
           return;
         }
+
+        if (!mounted) return;
 
         // Récupérer les informations de la liste
         const { data: listData, error: listError } = await supabase
@@ -64,7 +71,9 @@ export default function List({
           throw new Error('Liste non trouvée');
         }
 
-        setList(listData);
+        if (mounted) {
+          setList(listData);
+        }
 
         // Récupérer les items de la liste
         const { data: itemsData, error: itemsError } = await supabase
@@ -79,27 +88,140 @@ export default function List({
           );
         }
 
-        setItems(itemsData || []);
+        if (mounted) {
+          setItems(itemsData || []);
+        }
       } catch (err) {
         console.error('Erreur lors du chargement:', err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Une erreur inconnue est survenue'
-        );
+        if (mounted) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : 'Une erreur inconnue est survenue'
+          );
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchListAndItems();
 
-    // Note: Subscriptions Realtime désactivées temporairement pour éviter les erreurs WebSocket
-    // L'application fonctionne correctement en rechargeant les données lors de la navigation
+    // Surveiller les changements d'authentification et configurer Realtime
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT' || !session?.user) {
+        if (mounted) {
+          window.location.href = '/';
+        }
+      } else if (session?.user && mounted) {
+        // Configuration Realtime pour la liste
+        if (!listChannel) {
+          try {
+            listChannel = supabase
+              .channel(`list_detail_${resolvedParams.listId}`)
+              .on(
+                'postgres_changes',
+                {
+                  event: '*',
+                  schema: 'public',
+                  table: 'lists',
+                  filter: `id=eq.${resolvedParams.listId}`,
+                },
+                (payload) => {
+                  if (!mounted) return;
 
-    // Nettoyage (aucune subscription active)
+                  console.log('Synchronisation liste:', payload);
+
+                  if (payload.eventType === 'UPDATE') {
+                    setList(payload.new as List);
+                  }
+
+                  if (payload.eventType === 'DELETE') {
+                    // Rediriger si la liste est supprimée
+                    window.location.href = '/lists';
+                  }
+                }
+              )
+              .subscribe();
+          } catch (error) {
+            console.log('Info: Realtime liste non disponible:', error);
+          }
+        }
+
+        // Configuration Realtime pour les items
+        if (!itemsChannel) {
+          try {
+            itemsChannel = supabase
+              .channel(`items_detail_${resolvedParams.listId}`)
+              .on(
+                'postgres_changes',
+                {
+                  event: '*',
+                  schema: 'public',
+                  table: 'items',
+                  filter: `list_id=eq.${resolvedParams.listId}`,
+                },
+                (payload) => {
+                  if (!mounted) return;
+
+                  console.log('Synchronisation items:', payload);
+
+                  if (payload.eventType === 'INSERT') {
+                    setItems((currentItems) => {
+                      // Vérifier si l'item existe déjà pour éviter les doublons
+                      const exists = currentItems.some(
+                        (item) => item.id === payload.new.id
+                      );
+                      if (!exists) {
+                        return [payload.new as Item, ...currentItems];
+                      }
+                      return currentItems;
+                    });
+                  }
+
+                  if (payload.eventType === 'UPDATE') {
+                    setItems((currentItems) =>
+                      currentItems.map((item) =>
+                        item.id === payload.new.id
+                          ? (payload.new as Item)
+                          : item
+                      )
+                    );
+                  }
+
+                  if (payload.eventType === 'DELETE') {
+                    setItems((currentItems) =>
+                      currentItems.filter((item) => item.id !== payload.old.id)
+                    );
+                  }
+                }
+              )
+              .subscribe();
+          } catch (error) {
+            console.log('Info: Realtime items non disponible:', error);
+          }
+        }
+      }
+    });
+
+    authSubscription = subscription;
+
+    // Nettoyage des subscriptions
     return () => {
-      // Pas de nettoyage nécessaire pour le moment
+      mounted = false;
+      if (listChannel) {
+        supabase.removeChannel(listChannel).catch(() => {});
+      }
+      if (itemsChannel) {
+        supabase.removeChannel(itemsChannel).catch(() => {});
+      }
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, [resolvedParams.listId, supabase]);
 
@@ -128,6 +250,8 @@ export default function List({
       if (error) {
         throw new Error(`Erreur lors de l'ajout de l'item: ${error.message}`);
       }
+
+      console.log('Nouvel item créé:', data);
     } catch (err) {
       console.error("Erreur lors de l'ajout de l'item:", err);
       setError(

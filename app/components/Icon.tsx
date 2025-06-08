@@ -1,9 +1,10 @@
 import icon from '@/app/assets/pwa-icon.png';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Icon() {
   return (
-    <div className="flex items-center gap-1 pb-4">
+    <Link href="/" className="flex items-center gap-1 pb-4">
       <Image
         className="w-[40px] transition-transform duration-300 group-hover:scale-110"
         src={icon}
@@ -15,6 +16,6 @@ export default function Icon() {
           shoplist
         </span>
       </h1>
-    </div>
+    </Link>
   );
 }

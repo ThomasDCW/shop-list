@@ -4,10 +4,10 @@ import { createClient } from '@/app/utils/supabase/client';
 import { useState } from 'react';
 
 interface AuthProps {
-  onAuthSuccess: () => void;
+  onAuthSuccessAction: () => void;
 }
 
-export default function Auth({ onAuthSuccess }: AuthProps) {
+export default function Auth({ onAuthSuccessAction }: AuthProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +28,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
 
       if (error) throw error;
 
-      onAuthSuccess();
+      onAuthSuccessAction();
     } catch (error) {
       setError(
         error instanceof Error

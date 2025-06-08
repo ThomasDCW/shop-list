@@ -48,7 +48,7 @@ export default function Home() {
   if (!user) {
     return (
       <main className="space-y-8">
-        <Auth onAuthSuccess={() => {}} />
+        <Auth onAuthSuccessAction={() => {}} />
       </main>
     );
   }
