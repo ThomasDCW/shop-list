@@ -1,7 +1,7 @@
-export default function Home() {
+export default function List() {
   return (
     <main className="mx-auto h-screen max-w-xl px-4 py-4 sm:px-6 lg:px-8">
-      <p>Accueil</p>
+      <p>List</p>
     </main>
   );
 }
