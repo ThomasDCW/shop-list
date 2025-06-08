@@ -5,24 +5,50 @@ import { createClient } from '../utils/supabase/client';
 
 interface ListFormProps {
   placeholder: string;
+  onListCreated?: () => void;
 }
 
-export default function ListForm({ placeholder }: ListFormProps) {
+export default function ListForm({
+  placeholder,
+  onListCreated,
+}: ListFormProps) {
   const [value, setValue] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (value.trim()) {
-      // TODO: Ajouter la logique pour créer une nouvelle liste
       const supabase = createClient();
-      const { data, error } = await supabase.from('lists').insert({
-        name: value.trim(),
-      });
+
+      // Récupérer l'utilisateur connecté
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        console.error('Utilisateur non connecté');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('lists')
+        .insert({
+          name: value.trim(),
+          user_id: user.id,
+        })
+        .select();
+
       if (error) {
         console.error('Erreur lors de la création de la liste:', error);
+      } else {
+        console.log('Nouvelle liste créée:', data);
+        setValue('');
+
+        // Callback pour rafraîchir la liste
+        if (onListCreated) {
+          onListCreated();
+        }
+        // Note: La liste apparaîtra automatiquement grâce au rechargement de données
       }
-      console.log('Nouvelle liste:', data);
-      setValue('');
     }
   };
 
