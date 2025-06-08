@@ -54,7 +54,6 @@ export default function List({
 
         if (!mounted) return;
 
-        // Récupérer les informations de la liste
         const { data: listData, error: listError } = await supabase
           .from('lists')
           .select('*')
@@ -75,7 +74,6 @@ export default function List({
           setList(listData);
         }
 
-        // Récupérer les items de la liste
         const { data: itemsData, error: itemsError } = await supabase
           .from('items')
           .select('*')
@@ -109,7 +107,6 @@ export default function List({
 
     fetchListAndItems();
 
-    // Surveiller les changements d'authentification et configurer Realtime
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -118,7 +115,6 @@ export default function List({
           window.location.href = '/';
         }
       } else if (session?.user && mounted) {
-        // Configuration Realtime pour la liste
         if (!listChannel) {
           try {
             listChannel = supabase
@@ -141,7 +137,6 @@ export default function List({
                   }
 
                   if (payload.eventType === 'DELETE') {
-                    // Rediriger si la liste est supprimée
                     window.location.href = '/lists';
                   }
                 }
@@ -152,7 +147,6 @@ export default function List({
           }
         }
 
-        // Configuration Realtime pour les items
         if (!itemsChannel) {
           try {
             itemsChannel = supabase
@@ -172,7 +166,6 @@ export default function List({
 
                   if (payload.eventType === 'INSERT') {
                     setItems((currentItems) => {
-                      // Vérifier si l'item existe déjà pour éviter les doublons
                       const exists = currentItems.some(
                         (item) => item.id === payload.new.id
                       );
@@ -210,7 +203,6 @@ export default function List({
 
     authSubscription = subscription;
 
-    // Nettoyage des subscriptions
     return () => {
       mounted = false;
       if (listChannel) {
@@ -229,7 +221,6 @@ export default function List({
     try {
       setError(null);
 
-      // Récupérer l'utilisateur connecté
       const {
         data: { user },
       } = await supabase.auth.getUser();

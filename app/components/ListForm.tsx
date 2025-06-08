@@ -19,7 +19,6 @@ export default function ListForm({
     if (value.trim()) {
       const supabase = createClient();
 
-      // Récupérer l'utilisateur connecté
       const {
         data: { user },
       } = await supabase.auth.getUser();
