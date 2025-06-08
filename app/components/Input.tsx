@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 interface InputProps {
   onAddItemAction: (item: string) => void;
+  placeholder: string;
 }
 
-export default function Input({ onAddItemAction }: InputProps) {
+export default function Input({ onAddItemAction, placeholder }: InputProps) {
   const [value, setValue] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -18,13 +19,13 @@ export default function Input({ onAddItemAction }: InputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-xl">
+    <form onSubmit={handleSubmit} className="">
       <div className="flex items-center gap-2 rounded-lg bg-white p-2 shadow-sm">
         <input
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Entrez un produit"
+          placeholder={placeholder}
           className="flex-1 rounded-md border-none px-3 py-3 text-base focus:ring-2 focus:ring-[#ff761e] focus:outline-none sm:px-4 sm:py-3 sm:text-lg"
           aria-label="Ajouter un produit à la liste"
         />

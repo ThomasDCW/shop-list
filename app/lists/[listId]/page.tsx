@@ -27,7 +27,7 @@ export default function List({
         Listes / {resolvedParams.listId}
       </Link>
 
-      <Input onAddItemAction={handleAddItem} />
+      <Input onAddItemAction={handleAddItem} placeholder="Ajouter un produit" />
 
       <ul className="mt-4 space-y-2">
         {items.map((item, index) => (
