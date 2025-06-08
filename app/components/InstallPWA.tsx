@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
 export const InstallPWA = () => {
   const [supportsPWA, setSupportsPWA] = useState(false);
-  const [promptInstall, setPromptInstall] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [promptInstall, setPromptInstall] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -19,9 +18,9 @@ export const InstallPWA = () => {
       setSupportsPWA(true);
     };
 
-    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener('beforeinstallprompt', handler);
 
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const handleInstallClick = async () => {
@@ -31,7 +30,7 @@ export const InstallPWA = () => {
     try {
       await promptInstall.prompt();
       const { outcome } = await promptInstall.userChoice;
-      if (outcome === "accepted") {
+      if (outcome === 'accepted') {
         setSupportsPWA(false);
       }
     } catch (error) {
@@ -46,7 +45,7 @@ export const InstallPWA = () => {
   return (
     <button
       onClick={handleInstallClick}
-      className="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200"
+      className="fixed right-4 bottom-4 rounded-lg bg-blue-500 px-4 py-2 text-white shadow-lg transition-colors duration-200 hover:bg-blue-600"
       aria-label="Installer l'application"
     >
       Installer l&apos;application
