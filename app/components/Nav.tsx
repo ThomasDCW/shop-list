@@ -20,7 +20,7 @@ export default function Nav() {
             <IoMdHome size={24} />
           </Link>
           <Link
-            href="/list"
+            href="/lists"
             className="text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
             tabIndex={0}
             aria-label="Ma liste"

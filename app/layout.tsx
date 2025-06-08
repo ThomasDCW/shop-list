@@ -25,7 +25,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="fr">
       <body
@@ -34,8 +38,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           ' bg-gradient-to-b from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-800'
         }
       >
-        <Icon />
-        {children}
+        <div className="mx-auto flex h-dvh max-w-xl flex-col gap-2 p-4">
+          <Icon />
+          {children}
+        </div>
         <Nav />
         <InstallPWA />
       </body>
