@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript', 'prettier'),
+  ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
     rules: {
       'no-unused-vars': 'off',
@@ -28,7 +28,10 @@ const eslintConfig = [
           reservedFirst: true,
         },
       ],
-      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports' },
+      ],
       'import/no-unused-modules': [
         'error',
         {
