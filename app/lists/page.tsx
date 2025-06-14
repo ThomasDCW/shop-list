@@ -187,6 +187,7 @@ export default function Lists() {
                     setLists((currentLists) =>
                       currentLists.filter((list) => list.id !== payload.old.id)
                     );
+                    router.refresh();
                   }
                 }
               )
@@ -261,13 +262,12 @@ export default function Lists() {
         </div>
       )}
 
-      {/* Modal de confirmation de suppression */}
       {deleteConfirm.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4">
           <div className="animate-in zoom-in-95 w-full max-w-md transform rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-4 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-                <MdDelete />
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <MdDelete className="text-red-600" size={24} />
               </div>
               <p className="mt-2 text-sm text-gray-600">
                 Êtes-vous sûr de vouloir supprimer la liste{' '}
