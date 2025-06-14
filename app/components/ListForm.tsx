@@ -41,12 +41,9 @@ export default function ListForm({
       } else {
         console.log('Nouvelle liste créée:', data);
         setValue('');
-
-        // Callback pour rafraîchir la liste
         if (onListCreated) {
           onListCreated();
         }
-        // Note: La liste apparaîtra automatiquement grâce au rechargement de données
       }
     }
   };
@@ -64,7 +61,7 @@ export default function ListForm({
         />
         <button
           type="submit"
-          className="h-10 w-10 rounded-full bg-gradient-to-r from-[#ff761e] to-[#ff9500] text-xl font-bold text-white transition-colors duration-200 hover:bg-orange-700 focus:ring-2 focus:ring-[#ff761e] focus:ring-offset-1 focus:outline-none"
+          className="h-10 w-10 cursor-pointer rounded-full bg-gradient-to-r from-[#ff761e] to-[#ff9500] text-xl font-bold text-white transition-colors duration-200 hover:bg-orange-700 focus:ring-2 focus:ring-[#ff761e] focus:ring-offset-1 focus:outline-none"
           aria-label="Ajouter la liste"
         >
           +

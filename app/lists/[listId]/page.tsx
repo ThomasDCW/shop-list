@@ -12,6 +12,7 @@ interface Item {
   name: string;
   created_at?: string;
   updated_at?: string;
+  is_checked?: boolean;
 }
 
 interface List {
@@ -29,6 +30,7 @@ export default function List({
   const resolvedParams = React.use(params);
   const [items, setItems] = useState<Item[]>([]);
   const [list, setList] = useState<List | null>(null);
+  console.log(items);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
@@ -251,6 +253,60 @@ export default function List({
     }
   };
 
+  const handleToggleItem = async (itemId: string) => {
+    try {
+      setError(null);
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error('Utilisateur non connecté');
+      }
+
+      // Trouver l'item actuel
+      const currentItem = items.find((item) => item.id === itemId);
+      if (!currentItem) {
+        throw new Error('Item non trouvé');
+      }
+
+      // Mettre à jour l'état local immédiatement pour une meilleure UX
+      setItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === itemId ? { ...item, is_checked: !item.is_checked } : item
+        )
+      );
+
+      // Mettre à jour Supabase
+      const { error } = await supabase
+        .from('items')
+        .update({ is_checked: !currentItem.is_checked })
+        .eq('id', itemId);
+
+      if (error) {
+        // En cas d'erreur, revenir à l'état précédent
+        setItems((currentItems) =>
+          currentItems.map((item) =>
+            item.id === itemId
+              ? { ...item, is_checked: currentItem.is_checked }
+              : item
+          )
+        );
+        throw new Error(
+          `Erreur lors de la mise à jour de l'item: ${error.message}`
+        );
+      }
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour de l'item:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la mise à jour de l'item"
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <main className="space-y-6">
@@ -324,16 +380,24 @@ export default function List({
         </div>
       )}
 
-      <ul className="mt-4 space-y-2">
+      <div className="mt-4 space-y-2">
         {items.map((item) => (
-          <li
+          <div
             key={item.id}
-            className="flex items-center justify-between rounded-lg bg-white p-2 shadow-sm"
+            className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm"
           >
-            {item.name}
-          </li>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                className="h-4 w-4"
+                checked={item.is_checked}
+                onChange={() => handleToggleItem(item.id)}
+              />
+              <p className="text-sm">{item.name}</p>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
 
       {items.length === 0 && !isLoading && (
         <div className="py-8 text-center text-gray-500">

@@ -37,7 +37,6 @@ export default function Lists() {
     setOpenMenuId(openMenuId === listId ? null : listId);
   };
 
-  // Fermer le menu quand on clique en dehors
   useEffect(() => {
     const handleClickOutside = () => {
       if (openMenuId) {
@@ -49,7 +48,6 @@ export default function Lists() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [openMenuId]);
 
-  // Fermer la modal avec Échap
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && deleteConfirm.isOpen) {
@@ -67,7 +65,7 @@ export default function Lists() {
       listId,
       listName,
     });
-    setOpenMenuId(null); // Fermer le menu
+    setOpenMenuId(null);
   };
 
   const handleDeleteCancel = () => {
@@ -87,9 +85,15 @@ export default function Lists() {
 
       if (error) {
         console.error('Erreur lors de la suppression:', error);
+        return;
       }
 
-      handleDeleteCancel(); // Fermer la modal
+      setLists((currentLists) =>
+        currentLists.filter((list) => list.id !== deleteConfirm.listId)
+      );
+
+      handleDeleteCancel();
+      router.refresh();
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
     }
