@@ -22,6 +22,41 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'Shop List',
+    startupImage: [
+      {
+        url: '/icons/ios/1024.png',
+        media:
+          '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/icons/ios/1024.png',
+        media:
+          '(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/icons/ios/1024.png',
+        media:
+          '(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)',
+      },
+      {
+        url: '/icons/ios/1024.png',
+        media:
+          '(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)',
+      },
+      {
+        url: '/icons/ios/1024.png',
+        media:
+          '(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)',
+      },
+    ],
+  },
+  icons: {
+    apple: [
+      { url: '/icons/ios/180.png', sizes: '180x180', type: 'image/png' },
+      { url: '/icons/ios/167.png', sizes: '167x167', type: 'image/png' },
+      { url: '/icons/ios/152.png', sizes: '152x152', type: 'image/png' },
+      { url: '/icons/ios/120.png', sizes: '120x120', type: 'image/png' },
+    ],
   },
 };
 
