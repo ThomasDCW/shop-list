@@ -11,14 +11,8 @@ export const InstallPWA = () => {
   const [supportsPWA, setSupportsPWA] = useState(false);
   const [promptInstall, setPromptInstall] =
     useState<BeforeInstallPromptEvent | null>(null);
-  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    // Détection iOS
-    const isIOSDevice =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-    setIsIOS(isIOSDevice);
-
     const handler = (e: Event) => {
       e.preventDefault();
       setPromptInstall(e as BeforeInstallPromptEvent);
@@ -45,22 +39,8 @@ export const InstallPWA = () => {
     }
   };
 
-  if (!supportsPWA && !isIOS) {
+  if (!supportsPWA) {
     return null;
-  }
-
-  if (isIOS) {
-    return (
-      <div className="fixed right-4 bottom-4 left-4 rounded-lg bg-blue-500 p-4 text-white shadow-lg">
-        <p className="mb-2 text-center text-sm">
-          Pour installer l&apos;application sur votre iPhone :
-        </p>
-        <ol className="list-decimal pl-5 text-sm">
-          <li>Appuyez sur l&apos;icône de partage</li>
-          <li>Sélectionnez &quot;Sur l&apos;écran d&apos;accueil&quot;</li>
-        </ol>
-      </div>
-    );
   }
 
   return (
