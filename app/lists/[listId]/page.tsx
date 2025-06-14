@@ -414,24 +414,63 @@ export default function List({
       )}
 
       <div className="mt-4 space-y-2">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="group flex items-center justify-between rounded-lg bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md"
-            role="listitem"
-            aria-label={`Item: ${item.name}`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="relative flex items-center justify-center">
-                <input
-                  type="checkbox"
-                  className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-gray-300 transition-all duration-200 checked:border-[#ff761e] checked:bg-[#ff761e] hover:border-[#ff761e] focus:ring-2 focus:ring-[#ff761e] focus:ring-offset-2 focus:outline-none"
-                  checked={item.is_checked}
-                  onChange={() => handleToggleItem(item.id)}
-                  aria-label={`Marquer ${item.name} comme ${item.is_checked ? 'non complété' : 'complété'}`}
-                />
+        {items
+          .sort((a, b) => {
+            if (a.is_checked === b.is_checked) {
+              return (
+                new Date(b.created_at || '').getTime() -
+                new Date(a.created_at || '').getTime()
+              );
+            }
+            return a.is_checked ? 1 : -1;
+          })
+          .map((item) => (
+            <div
+              key={item.id}
+              className="group flex items-center justify-between rounded-lg bg-white p-4 shadow-sm hover:shadow-md"
+              role="listitem"
+              aria-label={`Item: ${item.name}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-gray-300 transition-all duration-200 checked:border-[#ff761e] checked:bg-[#ff761e] hover:border-[#ff761e] focus:ring-2 focus:ring-[#ff761e] focus:ring-offset-2 focus:outline-none"
+                    checked={item.is_checked}
+                    onChange={() => handleToggleItem(item.id)}
+                    aria-label={`Marquer ${item.name} comme ${item.is_checked ? 'non complété' : 'complété'}`}
+                  />
+                  <svg
+                    className="pointer-events-none absolute h-4 w-4 text-white opacity-0 transition-opacity duration-200 peer-checked:opacity-100"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <p
+                  className={`transition-all duration-200 ${
+                    item.is_checked
+                      ? 'text-gray-400 line-through'
+                      : 'text-gray-700'
+                  }`}
+                >
+                  {item.name}
+                </p>
+              </div>
+              <button
+                onClick={() => handleDeleteItem(item.id)}
+                className="transition-opacity duration-200"
+                aria-label={`Supprimer ${item.name}`}
+              >
                 <svg
-                  className="pointer-events-none absolute h-4 w-4 text-white opacity-0 transition-opacity duration-200 peer-checked:opacity-100"
+                  className="h-6 w-6 text-gray-400 transition-colors duration-200 hover:text-red-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -439,42 +478,13 @@ export default function List({
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M5 13l4 4L19 7"
+                    strokeWidth={2}
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   />
                 </svg>
-              </div>
-              <p
-                className={`text-sm transition-all duration-200 ${
-                  item.is_checked
-                    ? 'text-gray-400 line-through'
-                    : 'text-gray-700'
-                }`}
-              >
-                {item.name}
-              </p>
+              </button>
             </div>
-            <button
-              onClick={() => handleDeleteItem(item.id)}
-              className="opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus:opacity-100"
-              aria-label={`Supprimer ${item.name}`}
-            >
-              <svg
-                className="h-6 w-6 text-gray-400 transition-colors duration-200 hover:text-red-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
-            </button>
-          </div>
-        ))}
+          ))}
       </div>
 
       {items.length === 0 && !isLoading && (
