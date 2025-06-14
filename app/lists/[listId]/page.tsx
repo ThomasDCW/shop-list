@@ -307,6 +307,39 @@ export default function List({
     }
   };
 
+  const handleDeleteItem = async (itemId: string) => {
+    try {
+      setError(null);
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        throw new Error('Utilisateur non connecté');
+      }
+
+      const { error } = await supabase.from('items').delete().eq('id', itemId);
+
+      if (error) {
+        throw new Error(
+          `Erreur lors de la suppression de l'item: ${error.message}`
+        );
+      }
+
+      setItems((currentItems) =>
+        currentItems.filter((item) => item.id !== itemId)
+      );
+    } catch (err) {
+      console.error("Erreur lors de la suppression de l'item:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la suppression de l'item"
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <main className="space-y-6">
@@ -363,7 +396,7 @@ export default function List({
   }
 
   return (
-    <main className="space-y-6">
+    <main className="h-4/5 space-y-6 overflow-y-scroll">
       <Link
         href="/lists"
         className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
@@ -384,17 +417,62 @@ export default function List({
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm"
+            className="group flex items-center justify-between rounded-lg bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md"
+            role="listitem"
+            aria-label={`Item: ${item.name}`}
           >
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="h-4 w-4"
-                checked={item.is_checked}
-                onChange={() => handleToggleItem(item.id)}
-              />
-              <p className="text-sm">{item.name}</p>
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-gray-300 transition-all duration-200 checked:border-[#ff761e] checked:bg-[#ff761e] hover:border-[#ff761e] focus:ring-2 focus:ring-[#ff761e] focus:ring-offset-2 focus:outline-none"
+                  checked={item.is_checked}
+                  onChange={() => handleToggleItem(item.id)}
+                  aria-label={`Marquer ${item.name} comme ${item.is_checked ? 'non complété' : 'complété'}`}
+                />
+                <svg
+                  className="pointer-events-none absolute h-4 w-4 text-white opacity-0 transition-opacity duration-200 peer-checked:opacity-100"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <p
+                className={`text-sm transition-all duration-200 ${
+                  item.is_checked
+                    ? 'text-gray-400 line-through'
+                    : 'text-gray-700'
+                }`}
+              >
+                {item.name}
+              </p>
             </div>
+            <button
+              onClick={() => handleDeleteItem(item.id)}
+              className="opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus:opacity-100"
+              aria-label={`Supprimer ${item.name}`}
+            >
+              <svg
+                className="h-6 w-6 text-gray-400 transition-colors duration-200 hover:text-red-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
           </div>
         ))}
       </div>
