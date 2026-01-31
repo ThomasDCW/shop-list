@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaListCheck } from 'react-icons/fa6';
-import { IoMdHome } from 'react-icons/io';
 
 interface NavItemProps {
   href: string;
@@ -74,15 +73,9 @@ export default function Nav() {
   const navItems = [
     {
       href: '/',
-      icon: <IoMdHome size={22} />,
-      label: 'Accueil',
-      isActive: pathname === '/',
-    },
-    {
-      href: '/lists',
       icon: <FaListCheck size={20} />,
       label: 'Mes listes',
-      isActive: pathname === '/lists' || pathname.startsWith('/lists/'),
+      isActive: pathname === '/' || pathname.startsWith('/lists/'),
     },
   ];
 
